@@ -8,10 +8,12 @@ from utils import url_split
 
 
 def _get_transitland_feeds(after, limit):
-    req = urllib.request.Request('https://demo.transit.land/api/v2/query', { 'method': 'POST' })
+    req = urllib.request.Request(
+        "https://demo.transit.land/api/v2/query", {"method": "POST"}
+    )
 
-    req.add_header('Content-Type', 'application/json') # 400 without this
-    req.add_header('referer', 'https://www.transit.land/') # 403 without this
+    req.add_header("Content-Type", "application/json")  # 400 without this
+    req.add_header("referer", "https://www.transit.land/")  # 403 without this
 
     payload = {
         "operationName": None,
@@ -22,13 +24,26 @@ def _get_transitland_feeds(after, limit):
             "fetch_error": None,
             "import_status": None,
             "tags": {},
-            "after": after
+            "after": after,
         },
-        "query": """query ($specs: [String!], $after: Int, $limit: Int, $search: String, $fetch_error: Boolean, $import_status: ImportStatus, $tags: Tags) {
+        "query": """query (
+            $specs: [String!],
+            $after: Int, $limit: Int,
+            $search: String,
+            $fetch_error: Boolean,
+            $import_status: ImportStatus,
+            $tags: Tags
+        ) {
       entities: feeds(
         after: $after
         limit: $limit
-        where: {search: $search, spec: $specs, fetch_error: $fetch_error, import_status: $import_status, tags: $tags}
+        where: {
+            search: $search,
+            spec: $specs,
+            fetch_error: $fetch_error,
+            import_status: $import_status,
+            tags: $tags
+        }
       ) {
         id
         onestop_id
@@ -54,7 +69,7 @@ def _get_transitland_feeds(after, limit):
         }
         __typename
       }
-    }"""
+    }""",
     }
 
     data = json.dumps(payload)
@@ -65,23 +80,23 @@ def _get_transitland_feeds(after, limit):
 
 def get_transitland_feed(onestop_id):
     slug = urllib.parse.quote(onestop_id)
-    req = urllib.request.Request(f'https://www.transit.land/feeds/{slug}')
+    req = urllib.request.Request(f"https://www.transit.land/feeds/{slug}")
     r = urllib.request.urlopen(req)
     return r.read().decode()
 
 
 def get_transitland_feeds(after, limit):
     return get_cached(
-        f'transit-land_{after}_{limit}',
+        f"transit-land_{after}_{limit}",
         lambda: _get_transitland_feeds(after, limit),
-        directory='.cache/transit.land'
+        directory=".cache/transit.land",
     )
 
 
 def get_transitland_urls(domains):
     content = get_transitland_feeds(0, 10000)
     result = json.loads(content)
-    onestop_ids = [e['onestop_id'] for e in result['data']['entities']]
+    onestop_ids = [e["onestop_id"] for e in result["data"]["entities"]]
     result_urls = []
 
     # TODO reading/parsing these files is slow.
@@ -89,10 +104,10 @@ def get_transitland_urls(domains):
         html = get_cached(
             onestop_id,
             lambda: get_transitland_feed(onestop_id),
-            directory='.cache/transit.land'
+            directory=".cache/transit.land",
         )
-        soup = BeautifulSoup(html, 'html.parser')
-        for tag in soup.find_all('code'):
+        soup = BeautifulSoup(html, "html.parser")
+        for tag in soup.find_all("code"):
             url = tag.text
             domain, path = url_split(url)
             if domain in domains:
