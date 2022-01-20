@@ -57,8 +57,8 @@ def main():
 
     counts = {"matched": 0, "total": 0}
     for domain in sorted(domains.keys()):
-        missing = ["missing"]
         matched = ["matched"]
+        missing = ["missing"]
         unused = ["unused"]
         for path in domains[domain]["in_yml"]:
             counts["total"] += 1
@@ -70,9 +70,8 @@ def main():
         for path in domains[domain]["in_feeds"]:
             if path not in domains[domain]["in_yml"]:
                 unused.append(path)
-        if len(missing) > 1:
-            print(f"\n{domain}")
-            tabulate([missing, matched, unused])
+        print(f"\n{domain}")
+        tabulate([matched, missing, unused])
     print(f'Matched {counts["matched"]} / {counts["total"]} urls')
 
 
