@@ -9,7 +9,7 @@ import urllib.request
 import yaml
 
 from cache import get_cached, url_split
-from transit_land import get_transit_land_urls
+from transitland import get_transitland_urls
 from transitfeeds import get_transitfeeds_urls
 from utils import extract_urls
 
@@ -52,9 +52,9 @@ def main():
             }
         domains[domain]['in_yml'].append(path)
 
-    # for url in get_transit_land_urls(domains):
-    #     domain, path = url_split(clean_url(url))
-    #     domains[domain]['in_feeds'].append(path)
+    for url in get_transitland_urls(domains):
+        domain, path = url_split(clean_url(url))
+        domains[domain]['in_feeds'].append(path)
 
     for url in get_transitfeeds_urls(domains):
         domain, path = url_split(clean_url(url))

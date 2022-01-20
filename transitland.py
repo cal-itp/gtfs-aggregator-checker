@@ -7,7 +7,7 @@ from cache import get_cached
 from utils import url_split
 
 
-def _get_transit_land_feeds(after, limit):
+def _get_transitland_feeds(after, limit):
     req = urllib.request.Request('https://demo.transit.land/api/v2/query', { 'method': 'POST' })
 
     req.add_header('Content-Type', 'application/json') # 400 without this
@@ -63,32 +63,32 @@ def _get_transit_land_feeds(after, limit):
     return r.read().decode()
 
 
-def get_transit_land_feed(onestop_id):
+def get_transitland_feed(onestop_id):
     slug = urllib.parse.quote(onestop_id)
     req = urllib.request.Request(f'https://www.transit.land/feeds/{slug}')
     r = urllib.request.urlopen(req)
     return r.read().decode()
 
 
-def get_transit_land_feeds(after, limit):
+def get_transitland_feeds(after, limit):
     return get_cached(
         f'transit-land_{after}_{limit}',
-        lambda: _get_transit_land_feeds(after, limit),
+        lambda: _get_transitland_feeds(after, limit),
         directory='.cache/transit.land'
     )
 
 
-def get_transit_land_urls(domains):
-    content = get_transit_land_feeds(0, 10000)
+def get_transitland_urls(domains):
+    content = get_transitland_feeds(0, 10000)
     result = json.loads(content)
     onestop_ids = [e['onestop_id'] for e in result['data']['entities']]
     result_urls = []
 
-    # TODO reading/parsing these files is slow. Move to transit_land.py and cache
+    # TODO reading/parsing these files is slow.
     for onestop_id in onestop_ids:
         html = get_cached(
             onestop_id,
-            lambda: get_transit_land_feed(onestop_id),
+            lambda: get_transitland_feed(onestop_id),
             directory='.cache/transit.land'
         )
         soup = BeautifulSoup(html, 'html.parser')
