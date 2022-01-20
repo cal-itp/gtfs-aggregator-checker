@@ -71,5 +71,5 @@ def get_transit_land_feeds(after, limit):
     return get_cached(
         f'transit-land_{after}_{limit}',
         lambda: _get_transit_land_feeds(after, limit),
-        directory='.cache/transit_land'
+        directory='.cache/transit.land'
     )

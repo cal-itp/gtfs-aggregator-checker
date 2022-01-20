@@ -1,12 +1,12 @@
-from bs4 import BeautifulSoup
 from collections import defaultdict
 import json
 import logging
 import os
 import sys
 import urllib.error
-import urllib.parse
 import urllib.request
+
+from utils import url_split
 
 def mkdir(path, root='.'):
     """
@@ -30,6 +30,16 @@ def get_cached(key, func, directory='.cache'):
             print('wrote cached file', path)
     with open(path, 'r') as f:
         return f.read()
+
+
+def curl_cached(url):
+    domain, path = url_split(url)
+    key = path.replace('/', '__')
+    def get():
+        req = urllib.request.Request(url)
+        r = urllib.request.urlopen(req)
+        return r.read().decode()
+    return get_cached(key, get, os.path.join('.cache', domain))
 
 
 class JsonCache(dict):

@@ -8,8 +8,9 @@ import urllib.parse
 import urllib.request
 import yaml
 
-from cache import get_cached
+from cache import get_cached, url_split
 from transit_land import get_transit_land_feed, get_transit_land_feeds
+from utils import extract_urls
 
 
 def clean_url(url):
@@ -19,34 +20,6 @@ def clean_url(url):
     query.pop('token', None)
     url = url._replace(query=urllib.parse.urlencode(query, True))
     return urllib.parse.urlunparse(url)
-
-
-def url_split(url):
-    # For analyzing urls we usually only want the domain and the path+query
-    url_obj = urllib.parse.urlparse(url)
-    if url_obj.query:
-        return url_obj.netloc, f'{url_obj.path}?{url_obj.query}'
-    return url_obj.netloc, url_obj.path
-
-
-def extract_urls(dict_or_list, dict_prefix=''):
-    """
-    Recurse obj and return any urls
-    """
-    urls = []
-    def match(key, value):
-        return isinstance(value, (dict, list)) or key.startswith(dict_prefix)
-    def extract(obj):
-        if isinstance(obj, dict):
-            obj = [value for key, value in obj.items() if match(key, value)]
-        if isinstance(obj, str):
-            if obj.startswith('http'):
-                urls.append(obj)
-        elif isinstance(obj, list):
-            [extract(i) for i in obj]
-
-    extract(dict_or_list)
-    return urls
 
 
 def tabulate(columns):
@@ -87,7 +60,7 @@ def main():
         html = get_cached(
             onestop_id,
             lambda: get_transit_land_feed(onestop_id),
-            directory='.cache/transit_land'
+            directory='.cache/transit.land'
         )
         soup = BeautifulSoup(html, 'html.parser')
         for tag in soup.find_all('code'):
