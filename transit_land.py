@@ -1,7 +1,10 @@
-from cache import get_cached
+from bs4 import BeautifulSoup
 import json
 import urllib.parse
 import urllib.request
+
+from cache import get_cached
+from utils import url_split
 
 
 def _get_transit_land_feeds(after, limit):
@@ -73,3 +76,25 @@ def get_transit_land_feeds(after, limit):
         lambda: _get_transit_land_feeds(after, limit),
         directory='.cache/transit.land'
     )
+
+
+def get_transit_land_urls(domains):
+    content = get_transit_land_feeds(0, 10000)
+    result = json.loads(content)
+    onestop_ids = [e['onestop_id'] for e in result['data']['entities']]
+    result_urls = []
+
+    # TODO reading/parsing these files is slow. Move to transit_land.py and cache
+    for onestop_id in onestop_ids:
+        html = get_cached(
+            onestop_id,
+            lambda: get_transit_land_feed(onestop_id),
+            directory='.cache/transit.land'
+        )
+        soup = BeautifulSoup(html, 'html.parser')
+        for tag in soup.find_all('code'):
+            url = tag.text
+            domain, path = url_split(url)
+            if domain in domains:
+                result_urls.append(url)
+    return result_urls

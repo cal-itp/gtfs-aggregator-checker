@@ -9,7 +9,8 @@ import urllib.request
 import yaml
 
 from cache import get_cached, url_split
-from transit_land import get_transit_land_feed, get_transit_land_feeds
+from transit_land import get_transit_land_urls
+from transitfeeds import get_transitfeeds_urls
 from utils import extract_urls
 
 
@@ -35,10 +36,6 @@ def tabulate(columns):
 
 
 def main():
-    content = get_transit_land_feeds(0, 10000)
-    result = json.loads(content)
-    onestop_ids = [e['onestop_id'] for e in result['data']['entities']]
-
     matched = 0
     domains = {}
 
@@ -55,20 +52,13 @@ def main():
             }
         domains[domain]['in_yml'].append(path)
 
-    # TODO reading/parsing these files is slow. Move to transit_land.py and cache
-    for onestop_id in onestop_ids:
-        html = get_cached(
-            onestop_id,
-            lambda: get_transit_land_feed(onestop_id),
-            directory='.cache/transit.land'
-        )
-        soup = BeautifulSoup(html, 'html.parser')
-        for tag in soup.find_all('code'):
-            url = tag.text
-            url = clean_url(tag.text)
-            domain, path = url_split(url)
-            if domain in domains:
-                domains[domain]['in_feeds'].append(path)
+    # for url in get_transit_land_urls(domains):
+    #     domain, path = url_split(clean_url(url))
+    #     domains[domain]['in_feeds'].append(path)
+
+    for url in get_transitfeeds_urls(domains):
+        domain, path = url_split(clean_url(url))
+        domains[domain]['in_feeds'].append(path)
 
     counts = { 'matched': 0, 'total': 0 }
     for domain in sorted(domains.keys()):
