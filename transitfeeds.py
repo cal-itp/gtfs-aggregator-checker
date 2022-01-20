@@ -42,7 +42,6 @@ def get_transitfeeds_urls(domains):
         for a in soup.select("a.list-group-item"):
             feed_urls.append(resolve_url(a["href"]))
 
-    _skipped = []
     for feed_url in feed_urls:
         try:
             html = curl_cached(feed_url)
@@ -58,9 +57,6 @@ def get_transitfeeds_urls(domains):
             domain = urllib.parse.urlparse(url).netloc
             if domain in domains:
                 result_urls.add(url)
-            elif url not in _skipped and url.startswith("http"):
-                print("skipping", url)
-                _skipped.append(url)
     return result_urls
 
 
