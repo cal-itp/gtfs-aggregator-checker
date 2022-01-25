@@ -31,7 +31,6 @@ def tabulate(columns):
 
 
 def main():
-    matched = 0
     domains = {}
 
     with open("agencies.yml", "r") as f:
@@ -70,8 +69,9 @@ def main():
         for path in domains[domain]["in_feeds"]:
             if path not in domains[domain]["in_yml"]:
                 unused.append(path)
-        print(f"\n{domain}")
-        tabulate([matched, missing, unused])
+        if len(matched) > 1:
+            print(f"\n{domain}")
+            tabulate([matched, missing, unused])
     print(f'Matched {counts["matched"]} / {counts["total"]} urls')
 
 
