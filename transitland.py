@@ -4,7 +4,7 @@ import os
 import urllib.parse
 import urllib.request
 
-from cache import curl_cached
+from cache import curl_cached, JsonCache
 from utils import url_split
 
 load_dotenv()
@@ -20,24 +20,31 @@ def get_transitland_feed(feed_id):
 
 def get_feed_ids():
     url = f"{BASE_URL}operators?apikey={API_KEY}"
-    url += "&per_page=1000&state=US-CA&total=true"
+    url += "&per_page=10000&total=true"
     operators = json.loads(curl_cached(url, key="transitland_operators"))
     results = []
     for operator in operators["operators"]:
         results += operator["represented_in_feed_onestop_ids"]
-    return list(set(results))
+    return sorted(list(set(results)))
 
 
 def get_transitland_urls(domains):
-    feed_ids = get_feed_ids()
+    feed_ids = get_feed_ids()[::-1]
     result_urls = []
+    skip_ids = JsonCache("transit_land_skip_ids")
 
     # TODO reading/parsing these files is slow.
     for feed_id in feed_ids:
+        if feed_id in skip_ids:
+            print("skipping", feed_id)
+            continue
         try:
             feed = get_transitland_feed(feed_id)
-        except urllib.error.HTTPError:
-            print("Failed to get feed for feed_id: ", feed_id)
+        except urllib.error.HTTPError as e:
+            print("Failed to get feed for feed_id: ", feed_id, e.getcode())
+            if e.getcode() == 500:
+                print("^---- adding to skip_ids because 500")
+                skip_ids[feed_id] = True
             continue
         for urls in feed["urls"].values():
             if isinstance(urls, str):

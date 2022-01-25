@@ -1,0 +1,70 @@
+wrote cached file ./.cache/api.transit.land/transitland_operators
+skipping f-rb-atairporter380~manukauorangebus~tranzalpinerailway~abeltasm
+skipping f-9q5-vctc~ca~us
+skipping f-9q5-ladot
+skipping f-9-amtrak~amtrakcalifornia~amtrakcharteredvehicle
+failed to fetch: https://transitfeeds.com/p/mendocino-transit-authority/206
+failed to fetch: https://transitfeeds.com/p/orange-county-transportation-authority/198
+
+206.128.158.171
+matched                                                 missing   unused
+/TMGTFSRealTimeWebService/Vehicle/VehiclePositions.pb
+/TMGTFSRealTimeWebService/Alert/Alerts.pb
+/TMGTFSRealTimeWebService/TripUpdate/TripUpdates.pb
+
+206.128.158.191
+matched                                                 missing   unused
+/TMGTFSRealTimeWebService/Vehicle/VehiclePositions.pb
+/TMGTFSRealTimeWebService/Alert/Alerts.pb
+/TMGTFSRealTimeWebService/TripUpdate/TripUpdates.pb
+
+api.bart.gov
+matched                   missing   unused
+/gtfsrt/alerts.aspx
+/gtfsrt/tripupdate.aspx
+
+api.octa.net
+matched                                        missing   unused
+/GTFSRealTime/protoBuf/VehiclePositions.aspx             /GTFSRealTime/default.aspx
+/GTFSRealTime/protoBuf/servicealerts.aspx
+/GTFSRealTime/protoBuf/tripupdates.aspx
+
+citycommbus.com
+matched                     missing   unused
+/gtfs-rt/vehiclepositions
+/gtfs-rt/alerts
+/gtfs-rt/tripupdates
+
+govcbus.com
+matched                     missing   unused
+/gtfs-rt/vehiclepositions
+/gtfs-rt/alerts
+/gtfs-rt/tripupdates
+
+gtfs.bigbluebus.com
+matched                 missing   unused
+/vehiclepositions.bin             /current.zip
+/alerts.bin                       /current.zip
+/tripupdates.bin                  /
+
+gtfsrt.sacrt.com
+matched                              missing   unused
+/apps/gtfsrt/SRTD/vehiclepositions
+/apps/gtfsrt/SRTD/tripupdates
+
+rt.pasadenatransit.net
+matched                                            missing                                                 unused
+/rtt/public/utility/gtfsrealtime.aspx/alert        /rtt/public/utility/gtfsrealtime.aspx/vehicleposition   /rtt/public/utility/gtfs.aspx
+/rtt/public/utility/gtfsrealtime.aspx/tripupdate
+
+rtabus.com
+matched            missing   unused
+/gtfsrt/vehicles
+/gtfsrt/alerts
+/gtfsrt/trips
+
+thebuslive.com
+matched                     missing   unused
+/gtfs-rt/vehiclepositions
+/gtfs-rt/alerts
+Matched 29 / 120 urls
