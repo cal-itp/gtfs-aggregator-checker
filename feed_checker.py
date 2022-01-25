@@ -31,7 +31,6 @@ def tabulate(columns):
 
 
 def main():
-    matched = 0
     domains = {}
 
     with open("agencies.yml", "r") as f:

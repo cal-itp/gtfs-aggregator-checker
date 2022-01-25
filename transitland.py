@@ -1,115 +1,43 @@
-from bs4 import BeautifulSoup
 import json
-import urllib.parse
-import urllib.request
 
-from cache import get_cached
+from config import env
+from cache import curl_cached
 from utils import url_split
 
-
-def _get_transitland_feeds(after, limit):
-    req = urllib.request.Request(
-        "https://demo.transit.land/api/v2/query", {"method": "POST"}
-    )
-
-    req.add_header("Content-Type", "application/json")  # 400 without this
-    req.add_header("referer", "https://www.transit.land/")  # 403 without this
-
-    payload = {
-        "operationName": None,
-        "variables": {
-            "search": None,
-            "limit": limit,
-            "specs": ["gtfs", "gtfs-rt", "gbfs", "mds"],
-            "fetch_error": None,
-            "import_status": None,
-            "tags": {},
-            "after": after,
-        },
-        "query": """query (
-            $specs: [String!],
-            $after: Int, $limit: Int,
-            $search: String,
-            $fetch_error: Boolean,
-            $import_status: ImportStatus,
-            $tags: Tags
-        ) {
-      entities: feeds(
-        after: $after
-        limit: $limit
-        where: {
-            search: $search,
-            spec: $specs,
-            fetch_error: $fetch_error,
-            import_status: $import_status,
-            tags: $tags
-        }
-      ) {
-        id
-        onestop_id
-        spec
-        tags
-        feed_state {
-          id
-          feed_version {
-            id
-            fetched_at
-            sha1
-            feed_version_gtfs_import {
-              id
-              created_at
-              __typename
-            }
-            __typename
-          }
-          last_fetch_error
-          last_fetched_at
-          last_successful_fetch_at
-          __typename
-        }
-        __typename
-      }
-    }""",
-    }
-
-    data = json.dumps(payload)
-
-    r = urllib.request.urlopen(req, data=data.encode())
-    return r.read().decode()
+API_KEY = env["TRANSITLAND_API_KEY"]
+BASE_URL = f"https://transit.land/api/v2/rest/feeds?apikey={API_KEY}"
+BASE_URL += "&limit=1000"
 
 
-def get_transitland_feed(onestop_id):
-    slug = urllib.parse.quote(onestop_id)
-    req = urllib.request.Request(f"https://www.transit.land/feeds/{slug}")
-    r = urllib.request.urlopen(req)
-    return r.read().decode()
-
-
-def get_transitland_feeds(after, limit):
-    return get_cached(
-        f"transit-land_{after}_{limit}",
-        lambda: _get_transitland_feeds(after, limit),
-        directory=".cache/transit.land",
-    )
+def get_feeds(after=None):
+    url = BASE_URL
+    if after:
+        url += f"&after={after}"
+    text = curl_cached(url, key=f"feeds_after__{after}")
+    data = json.loads(text)
+    results = set()
+    for feed in data["feeds"]:
+        for urls in feed["urls"].values():
+            if isinstance(urls, str):
+                urls = [urls]
+            for url in urls:
+                results.add(url)
+    after = None
+    if "meta" in data:
+        after = data["meta"]["after"]
+    return list(results), after
 
 
 def get_transitland_urls(domains):
-    content = get_transitland_feeds(0, 10000)
-    result = json.loads(content)
-    onestop_ids = [e["onestop_id"] for e in result["data"]["entities"]]
+    urls, after = get_feeds()
+    while True:
+        new_urls, after = get_feeds(after)
+        urls += new_urls
+        if not after:
+            break
     result_urls = []
-
-    # TODO reading/parsing these files is slow.
-    for onestop_id in onestop_ids:
-        html = get_cached(
-            onestop_id,
-            lambda: get_transitland_feed(onestop_id),
-            directory=".cache/transit.land",
-        )
-        soup = BeautifulSoup(html, "html.parser")
-        for tag in soup.find_all("code"):
-            url = tag.text
-            domain, path = url_split(url)
-            if domain in domains:
-                result_urls.append(url)
+    for url in urls:
+        domain, path = url_split(url)
+        if domain in domains:
+            result_urls.append(url)
     return result_urls

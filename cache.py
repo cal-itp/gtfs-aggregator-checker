@@ -30,9 +30,12 @@ def get_cached(key, func, directory=".cache"):
         return f.read()
 
 
-def curl_cached(url):
+def curl_cached(url, key=None):
     domain, path = url_split(url)
-    key = path.replace("/", "__")
+    if key is None:
+        key = path.replace("/", "__")
+    if len(key) > 255:
+        key = key[:255]  # max wilename length is 255
 
     def get():
         req = urllib.request.Request(url)
