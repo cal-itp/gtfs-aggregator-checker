@@ -9,14 +9,14 @@ def url_split(url):
     return url_obj.netloc, url_obj.path
 
 
-def extract_urls(dict_or_list, dict_prefix=""):
+def extract_urls(dict_or_list):
     """
     Recurse obj and return any urls
     """
     urls = []
 
     def match(key, value):
-        return isinstance(value, (dict, list)) or key.startswith(dict_prefix)
+        return isinstance(value, (dict, list, str))
 
     def extract(obj):
         if isinstance(obj, dict):

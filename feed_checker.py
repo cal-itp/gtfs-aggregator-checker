@@ -36,7 +36,7 @@ def main():
 
     with open("agencies.yml", "r") as f:
         agencies_obj = yaml.load(f, Loader=yaml.SafeLoader)
-    urls = extract_urls(agencies_obj, dict_prefix="gtfs_rt")
+    urls = extract_urls(agencies_obj)
     for url in urls:
         url = clean_url(url)
         domain, path = url_split(url)
