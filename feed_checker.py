@@ -1,3 +1,4 @@
+import typer
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -30,10 +31,12 @@ def tabulate(columns):
         print("   ".join(row))
 
 
-def main():
+def main(
+    yml_file=typer.Argument("agencies.yml"), prefix=typer.Option("gtfs_"),
+):
     domains = {}
 
-    with open("agencies.yml", "r") as f:
+    with open(yml_file, "r") as f:
         agencies_obj = yaml.load(f, Loader=yaml.SafeLoader)
     urls = extract_urls(agencies_obj)
     for url in urls:
@@ -75,4 +78,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    typer.run(main)
