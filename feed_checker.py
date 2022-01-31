@@ -1,3 +1,4 @@
+import json
 import typer
 import urllib.error
 import urllib.parse
@@ -19,7 +20,10 @@ def clean_url(url):
     return urllib.parse.urlunparse(url)
 
 
-def tabulate(columns):
+def tabulate(data, column_names):
+    columns = []
+    for name in column_names:
+        columns.append([name, *data[name]])
     column_sizes = [max([len(s) for s in column]) for column in columns]
     num_rows = max([len(column) for column in columns])
     for i_row in range(num_rows):
@@ -35,6 +39,8 @@ def main(
     yml_file=typer.Argument("agencies.yml", help="A yml file containing urls"),
     csv_file=typer.Option(None, help="A csv file (one url per line)"),
     url=typer.Option(None, help="URL to check instead of a file",),
+    output=typer.Option(None, help="Path to a file to save output to."),
+    verbose: bool = typer.Option(False, help="Print a result table to stdout"),
 ):
     domains = {}
 
@@ -67,22 +73,30 @@ def main(
         domains[domain]["in_feeds"].append(path)
 
     counts = {"matched": 0, "total": 0}
+    results = {}
     for domain in sorted(domains.keys()):
-        matched = ["matched"]
-        missing = ["missing"]
-        unused = ["unused"]
+        results[domain] = {
+            "matched": [],
+            "missing": [],
+            "unused": [],
+        }
         for path in domains[domain]["in_yml"]:
             counts["total"] += 1
             if path in domains[domain]["in_feeds"]:
                 counts["matched"] += 1
-                matched.append(path)
+                results[domain]["matched"].append(path)
             else:
-                missing.append(path)
+                results[domain]["missing"].append(path)
         for path in domains[domain]["in_feeds"]:
             if path not in domains[domain]["in_yml"]:
-                unused.append(path)
-        print(f"\n{domain}")
-        tabulate([matched, missing, unused])
+                results[domain]["unused"].append(path)
+        if verbose:
+            print(f"\n{domain}")
+            tabulate(results[domain], ["matched", "missing", "unused"])
+    if output:
+        with open(output, "w") as f:
+            f.write(json.dumps(results, indent=4))
+            print(f"Results saved to {output}")
     print(f'Matched {counts["matched"]} / {counts["total"]} urls')
 
 
