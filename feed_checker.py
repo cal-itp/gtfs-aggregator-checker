@@ -1,3 +1,4 @@
+import typer
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -30,12 +31,23 @@ def tabulate(columns):
         print("   ".join(row))
 
 
-def main():
+def main(
+    yml_file=typer.Argument("agencies.yml", help="A yml file containing urls"),
+    csv_file=typer.Option(None, help="A csv file (one url per line)"),
+    url=typer.Option(None, help="URL to check instead of a file",),
+):
     domains = {}
 
-    with open("agencies.yml", "r") as f:
-        agencies_obj = yaml.load(f, Loader=yaml.SafeLoader)
-    urls = extract_urls(agencies_obj)
+    if url:
+        urls = [url]
+    elif csv_file:
+        with open(csv_file, "r") as f:
+            urls = f.read().strip().splitlines()
+    else:
+        with open(yml_file, "r") as f:
+            agencies_obj = yaml.load(f, Loader=yaml.SafeLoader)
+        urls = extract_urls(agencies_obj)
+    urls = list(set([url.strip() for url in urls]))
     for url in urls:
         url = clean_url(url)
         domain, path = url_split(url)
@@ -75,4 +87,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    typer.run(main)
