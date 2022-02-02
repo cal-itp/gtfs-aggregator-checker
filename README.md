@@ -27,7 +27,7 @@ outcome would mean the missing column is empty for all domains.
 ## CLI Usage
 
 `python feed_checker.py` or `python feed_checker.py /path/to/yml` will search a
-yaml file for any urls and see if they are present in any of the feed
+Cal-ITP [agencies.yml](https://github.com/cal-itp/data-infra/blob/main/airflow/data/agencies.yml) file for any urls and see if they are present in any of the feed
 aggregators.
 
 ### Options
