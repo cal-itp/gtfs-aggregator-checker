@@ -1,10 +1,7 @@
 from bs4 import BeautifulSoup
-import urllib.parse
 from urllib.error import HTTPError
-import yaml
 
 from cache import curl_cached
-from utils import extract_urls
 
 LOCATION = "67-california-usa"
 ROOT = "https://transitfeeds.com"
@@ -18,11 +15,11 @@ def resolve_url(url):
     raise ValueError("Not a transit feed url: {url}")
 
 
-def get_transitfeeds_urls(domains):
+def get_transitfeeds_urls():
     page_urls = []
     provider_urls = []
     feed_urls = []
-    result_urls = set()
+    results = []
 
     html = curl_cached(f"{ROOT}/l/{LOCATION}")
     soup = BeautifulSoup(html, "html.parser")
@@ -54,19 +51,5 @@ def get_transitfeeds_urls(domains):
             url = a["href"]
             if url.startswith("/") or url.startswith(ROOT):
                 continue
-            domain = urllib.parse.urlparse(url).netloc
-            if domain in domains:
-                result_urls.add(url)
-    return result_urls
-
-
-if __name__ == "__main__":
-    with open("agencies.yml", "r") as f:
-        agencies_obj = yaml.load(f, Loader=yaml.SafeLoader)
-    urls = extract_urls(agencies_obj, dict_prefix="gtfs_rt")
-    domains = set()
-    for url in urls:
-        domains.add(urllib.parse.urlparse(url).netloc)
-    for url in get_transitfeeds_urls(domains):
-        if url in urls:
-            print(url)
+            results.append((feed_url, url))
+    return results

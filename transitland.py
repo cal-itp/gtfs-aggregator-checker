@@ -2,7 +2,6 @@ import json
 
 from config import env
 from cache import curl_cached
-from utils import url_split
 
 API_KEY = env["TRANSITLAND_API_KEY"]
 BASE_URL = f"https://transit.land/api/v2/rest/feeds?apikey={API_KEY}"
@@ -15,29 +14,26 @@ def get_feeds(after=None):
         url += f"&after={after}"
     text = curl_cached(url, key=f"feeds_after__{after}")
     data = json.loads(text)
-    results = set()
+    results = []
     for feed in data["feeds"]:
         for urls in feed["urls"].values():
             if isinstance(urls, str):
                 urls = [urls]
             for url in urls:
-                results.add(url)
+                results.append(
+                    (f"https://transit.land/feeds/{feed['onestop_id']}", url)
+                )
     after = None
     if "meta" in data:
         after = data["meta"]["after"]
     return list(results), after
 
 
-def get_transitland_urls(domains):
+def get_transitland_urls():
     urls, after = get_feeds()
     while True:
         new_urls, after = get_feeds(after)
         urls += new_urls
         if not after:
             break
-    result_urls = []
-    for url in urls:
-        domain, path = url_split(url)
-        if domain in domains:
-            result_urls.append(url)
-    return result_urls
+    return urls

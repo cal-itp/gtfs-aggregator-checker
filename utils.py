@@ -7,25 +7,3 @@ def url_split(url):
     if url_obj.query:
         return url_obj.netloc, f"{url_obj.path}?{url_obj.query}"
     return url_obj.netloc, url_obj.path
-
-
-def extract_urls(dict_or_list):
-    """
-    Recurse obj and return any urls
-    """
-    urls = []
-
-    def match(key, value):
-        return isinstance(value, (dict, list, str))
-
-    def extract(obj):
-        if isinstance(obj, dict):
-            obj = [value for key, value in obj.items() if match(key, value)]
-        if isinstance(obj, str):
-            if obj.startswith("http"):
-                urls.append(obj)
-        elif isinstance(obj, list):
-            [extract(i) for i in obj]
-
-    extract(dict_or_list)
-    return urls
