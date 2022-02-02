@@ -5,10 +5,8 @@ import urllib.parse
 import urllib.request
 import yaml
 
-from cache import url_split
 from transitland import get_transitland_urls
 from transitfeeds import get_transitfeeds_urls
-from utils import extract_urls
 
 
 def clean_url(url):
@@ -42,62 +40,72 @@ def main(
     output=typer.Option(None, help="Path to a file to save output to."),
     verbose: bool = typer.Option(False, help="Print a result table to stdout"),
 ):
-    domains = {}
+    results = {}
 
     if url:
-        urls = [url]
+        results[url] = {
+            "transitfeeds": {"status": "missing"},
+            "transitland": {"status": "missing"},
+        }
     elif csv_file:
         with open(csv_file, "r") as f:
             urls = f.read().strip().splitlines()
+            for url in urls:
+                results[url] = {
+                    "transitfeeds": {"status": "missing"},
+                    "transitland": {"status": "missing"},
+                }
     else:
         with open(yml_file, "r") as f:
             agencies_obj = yaml.load(f, Loader=yaml.SafeLoader)
-        urls = extract_urls(agencies_obj)
-    urls = list(set([url.strip() for url in urls]))
-    for url in urls:
-        url = clean_url(url)
-        domain, path = url_split(url)
-        if domain not in domains:
-            domains[domain] = {
-                "in_yml": [],
-                "in_feeds": [],
+            for agency in agencies_obj.values():
+                for feed in agency["feeds"]:
+                    for url_number, (url_type, url) in enumerate(feed.items()):
+                        if not url:
+                            continue
+                        results[url] = {
+                            "url_type": url_type,
+                            "itp_id": agency["itp_id"],
+                            "url_number": url_number,
+                            "transitfeeds": {"status": "missing"},
+                            "transitland": {"status": "missing"},
+                        }
+
+    for public_web_url, url in get_transitland_urls():
+        if url in results:
+            results[url]["transitland"] = {
+                "status": "present",
+                "public_web_url": public_web_url,
             }
-        domains[domain]["in_yml"].append(path)
 
-    for url in get_transitland_urls(domains):
-        domain, path = url_split(clean_url(url))
-        domains[domain]["in_feeds"].append(path)
+    for public_web_url, url in get_transitfeeds_urls():
+        if url in results:
+            results[url]["transitfeeds"] = {
+                "status": "present",
+                "public_web_url": public_web_url,
+            }
 
-    for url in get_transitfeeds_urls(domains):
-        domain, path = url_split(clean_url(url))
-        domains[domain]["in_feeds"].append(path)
+    missing = []
+    for url, data in results.items():
+        statuses = [
+            data["transitfeeds"]["status"],
+            data["transitland"]["status"],
+        ]
+        if "present" not in statuses:
+            missing.append(url)
 
-    counts = {"matched": 0, "total": 0}
-    results = {}
-    for domain in sorted(domains.keys()):
-        results[domain] = {
-            "matched": [],
-            "missing": [],
-            "unused": [],
-        }
-        for path in domains[domain]["in_yml"]:
-            counts["total"] += 1
-            if path in domains[domain]["in_feeds"]:
-                counts["matched"] += 1
-                results[domain]["matched"].append(path)
-            else:
-                results[domain]["missing"].append(path)
-        for path in domains[domain]["in_feeds"]:
-            if path not in domains[domain]["in_yml"]:
-                results[domain]["unused"].append(path)
-        if verbose:
-            print(f"\n{domain}")
-            tabulate(results[domain], ["matched", "missing", "unused"])
+    if missing and verbose:
+        print(f"Unable to find {len(missing)}/{len(results)} urls:")
+        for url in missing:
+            print(url)
+    else:
+        matched = len(results) - len(missing)
+        print(f"Found {matched}/{len(results)} urls were found")
+
     if output:
         with open(output, "w") as f:
             f.write(json.dumps(results, indent=4))
             print(f"Results saved to {output}")
-    print(f'Matched {counts["matched"]} / {counts["total"]} urls')
 
 
 if __name__ == "__main__":
