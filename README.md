@@ -26,7 +26,13 @@ outcome would mean the missing column is empty for all domains.
 
 ## CLI Usage
 
-* help: `python feed_checker.py --help`
-* YAML file: `python feed_checker.py` or `python feed_checker.py /path/to/yml`
-* CSV file: `python feed_checker.py --csv-file agencies.csv` (one url per line)
-* Single URL: `python feed_checker.py --url http://example.com`
+`python feed_checker.py` or `python feed_checker.py /path/to/yml` will search a
+Cal-ITP [agencies.yml](https://github.com/cal-itp/data-infra/blob/main/airflow/data/agencies.yml) file for any urls and see if they are present in any of the feed
+aggregators.
+
+### Options
+* `python feed_checker.py --help` print the help
+* `--csv-file agencies.csv` load a csv instead of a Cal-ITP agencies yaml file (one url per line)
+* `--url http://example.com` Check a single url instead of a Cal-ITP agencies yaml file
+* `--verbose` Print a table of all results (organized by domain)
+* `--output /path/to/file.json` Save the results as a json file
