@@ -32,7 +32,7 @@ aggregators.
 
 ### Options
 * `python feed_checker.py --help` print the help
-* `--csv-file agencies.csv` load a csv instead of a yaml file (one url per line)
-* `--url http://example.com` Check a single url instead of a yaml file
+* `--csv-file agencies.csv` load a csv instead of a Cal-ITP agencies yaml file (one url per line)
+* `--url http://example.com` Check a single url instead of a Cal-ITP agencies yaml file
 * `--verbose` Print a table of all results (organized by domain)
 * `--output /path/to/file.json` Save the results as a json file
