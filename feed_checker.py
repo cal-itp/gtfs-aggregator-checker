@@ -10,13 +10,16 @@ from transitland import get_transitland_urls
 from transitfeeds import get_transitfeeds_urls
 
 
+SECRET_PARAMS = ["api_key", "token", "apiKey", "key"]
+
+
 def clean_url(url):
     if not url:
         raise Exception()
     url = urllib.parse.urlparse(url)
     query = urllib.parse.parse_qs(url.query, keep_blank_values=True)
-    query.pop("api_key", None)
-    query.pop("token", None)
+    for param in SECRET_PARAMS:
+        query.pop(param, None)
     query = OrderedDict(sorted(query.items()))
     query_string = urllib.parse.urlencode(query, True)
     url = url._replace(query=query_string, scheme="https")
