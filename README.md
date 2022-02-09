@@ -5,12 +5,20 @@ Currently it checks transit.land and transitfeeds.com to verify that feeds are
 listed in an aggregator.
 
 
+## Requirements
+
+* `.env` - Acquire an [api key from transitland][1] and save it to a `.env` file
+  like `TRANSITLAND_API_KEY=SECRET`. Alternatively you can prefix commands with
+  the api key like `TRANSITLAND_API_KEY=SECRET python feed_checker.py [...]`.
+
+* `agencies.yml` - This file can have any structure as the feed checker just
+  looks for any urls (strings starting with `'http://'`), but the intended usage
+  is a [Cal-ITP agencies.yml file][2].
+
 ## Getting Started
 
-First place an `agencies.yml` file in this folder. This file can have any
-structure as the feed checker just looks for any urls (strings starting with
-`'http://'`). To check urls run the following. The first time you run this it
-will take a while since the cache is empty.
+To install requirments and check urls run the following. The first time you run
+this it will take a while since the cache is empty.
 
 ``` bash
 pip install -r requirements.txt
@@ -24,11 +32,12 @@ matched (in both `agencies.yml` and aggregator), missing (in `agencies.yml` but
 not aggregator) or unused (in aggregator but not in `agencies.yml`). An ideal
 outcome would mean the missing column is empty for all domains.
 
+
 ## CLI Usage
 
 `python feed_checker.py` or `python feed_checker.py /path/to/yml` will search a
-Cal-ITP [agencies.yml](https://github.com/cal-itp/data-infra/blob/main/airflow/data/agencies.yml) file for any urls and see if they are present in any of the feed
-aggregators.
+[Cal-ITP agencies.yml file][2] for any urls and see if they are present in any
+of the feed aggregators.
 
 ### Options
 * `python feed_checker.py --help` print the help
@@ -36,3 +45,6 @@ aggregators.
 * `--url http://example.com` Check a single url instead of a Cal-ITP agencies yaml file
 * `--verbose` Print a table of all results (organized by domain)
 * `--output /path/to/file.json` Save the results as a json file
+
+[1]: https://www.transit.land/documentation/index#signing-up-for-an-api-key
+[2]: https://github.com/cal-itp/data-infra/blob/main/airflow/data/agencies.yml
