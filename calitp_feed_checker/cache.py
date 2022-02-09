@@ -3,7 +3,7 @@ import os
 import urllib.error
 import urllib.request
 
-from utils import url_split
+from .utils import url_split
 
 
 def mkdir(path, root="."):
