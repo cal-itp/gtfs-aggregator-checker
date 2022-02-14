@@ -13,7 +13,8 @@ listed in an aggregator.
 
 * `agencies.yml` - This file can have any structure as the feed checker just
   looks for any urls (strings starting with `'http://'`), but the intended usage
-  is a [Cal-ITP agencies.yml file][2].
+  is a [Cal-ITP agencies.yml file][2]. (to run the program without an
+  `agencies.yml` file, see the "Options" section below)
 
 ## Getting Started
 
