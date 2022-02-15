@@ -7,10 +7,10 @@ from .utils import url_split
 
 
 def get_cache_dir():
-    if "CALITP_CACHE_DIR" in os.environ:
-        path = Path(os.environ["CALITP_CACHE_DIR"])
+    if "GTFS_CACHE_DIR" in os.environ:
+        path = Path(os.environ["GTFS_CACHE_DIR"])
     else:
-        path = Path.home() / ".cache/calitp_feed_checker"
+        path = Path.home() / ".cache/gtfs-aggregator-checker"
     path.mkdir(exist_ok=True, parents=True)
     return path
 

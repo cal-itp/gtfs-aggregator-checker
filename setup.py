@@ -5,14 +5,14 @@ from setuptools import setup, find_namespace_packages
 
 _version_re = re.compile(r"__version__\s+=\s+(.*)")
 
-with open("feed_checker/__init__.py", "r") as f:
+with open("gtfs_aggregator_checker/__init__.py", "r") as f:
     version = _version_re.search(f.read()).group(1).strip("'\"")
 
 with open("README.md", "r") as f:
     long_description = f.read()
 
 setup(
-    name="calitp_feed_checker",
+    name="gtfs_aggregator_checker",
     version=version,
     packages=find_namespace_packages(),
     install_requires=[
@@ -27,5 +27,5 @@ setup(
     long_description_content_type="text/markdown",
     author="",
     author_email="",
-    url="https://github.com/cal-itp/feed_checker",
+    url="https://github.com/cal-itp/gtfs-aggregator-checker",
 )
