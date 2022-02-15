@@ -9,7 +9,7 @@ from .transitland import get_transitland_urls
 from .transitfeeds import get_transitfeeds_urls
 
 
-__version__ = "0.0.1"
+__version__ = "1.0.0"
 SECRET_PARAMS = ["api_key", "token", "apiKey", "key"]
 
 
