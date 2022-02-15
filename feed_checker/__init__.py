@@ -9,7 +9,7 @@ from .transitland import get_transitland_urls
 from .transitfeeds import get_transitfeeds_urls
 
 
-__version__ = "1.0.0"
+__version__ = "0.0.1"
 SECRET_PARAMS = ["api_key", "token", "apiKey", "key"]
 
 
@@ -27,7 +27,12 @@ def clean_url(url):
 
 
 def check_feeds(
-    yml_file=None, csv_file=None, url=None, output=None, verbose=False,
+    yml_file=None,
+    csv_file=None,
+    url=None,
+    output=None,
+    verbose=False,
+    clear_cache=False,
 ):
     results = {}
 
