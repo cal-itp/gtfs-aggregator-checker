@@ -27,12 +27,7 @@ def clean_url(url):
 
 
 def check_feeds(
-    yml_file=None,
-    csv_file=None,
-    url=None,
-    output=None,
-    verbose=False,
-    clear_cache=False,
+    yml_file=None, csv_file=None, url=None, output=None, verbose=False,
 ):
     results = {}
 
