@@ -40,9 +40,7 @@ many of those were matched in a feed.
   (one url per line)
 * `--url http://example.com` Check a single url instead of a Cal-ITP agencies
   yaml file
-* `--verbose` Print a table of all results (organized by domain)
 * `--output /path/to/file.json` Save the results as a json file
-* `--clear-cache` Deletes the cache folder before running.
 
 [1]: https://www.transit.land/documentation/index#signing-up-for-an-api-key
 [2]: https://github.com/cal-itp/data-infra/blob/main/airflow/data/agencies.yml

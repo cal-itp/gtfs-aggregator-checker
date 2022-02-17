@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-import sys
 import urllib.error
 import urllib.request
 
@@ -24,13 +23,11 @@ def get_cached(key, func, directory=None):
         content = func()
         with open(path, "w") as f:
             f.write(content)
-            if "--verbose" in sys.argv:
-                print("wrote cached file", path)
     with open(path, "r") as f:
         return f.read()
 
 
-def curl_cached(url, key=None, verbose=False):
+def curl_cached(url, key=None):
     domain, path = url_split(url)
     if key is None:
         key = path.replace("/", "__")

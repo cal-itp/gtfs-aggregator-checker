@@ -26,9 +26,7 @@ def clean_url(url):
     return urllib.parse.urlunparse(url)
 
 
-def check_feeds(
-    yml_file=None, csv_file=None, url=None, output=None, verbose=False,
-):
+def check_feeds(yml_file=None, csv_file=None, url=None, output=None):
     results = {}
 
     if url:
@@ -92,7 +90,7 @@ def check_feeds(
         if "present" not in statuses:
             missing.append(url)
 
-    if missing and verbose:
+    if missing:
         print(f"Unable to find {len(missing)}/{len(results)} urls:")
         for url in missing:
             print(url)
