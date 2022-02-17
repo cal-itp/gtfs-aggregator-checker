@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 from urllib.error import HTTPError
 
-from cache import curl_cached
+from .cache import curl_cached
 
 LOCATION = "67-california-usa"
 ROOT = "https://transitfeeds.com"

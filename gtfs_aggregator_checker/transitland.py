@@ -1,7 +1,7 @@
 import json
 
-from config import env
-from cache import curl_cached
+from .config import env
+from .cache import curl_cached
 
 API_KEY = env["TRANSITLAND_API_KEY"]
 BASE_URL = f"https://transit.land/api/v2/rest/feeds?apikey={API_KEY}"

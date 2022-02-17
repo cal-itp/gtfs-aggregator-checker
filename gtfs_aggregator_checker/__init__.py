@@ -1,15 +1,15 @@
 from collections import OrderedDict
 import json
-import typer
 import urllib.error
 import urllib.parse
 import urllib.request
 import yaml
 
-from transitland import get_transitland_urls
-from transitfeeds import get_transitfeeds_urls
+from .transitland import get_transitland_urls
+from .transitfeeds import get_transitfeeds_urls
 
 
+__version__ = "1.0.0"
 SECRET_PARAMS = ["api_key", "token", "apiKey", "key"]
 
 
@@ -26,13 +26,7 @@ def clean_url(url):
     return urllib.parse.urlunparse(url)
 
 
-def main(
-    yml_file=typer.Argument("agencies.yml", help="A yml file containing urls"),
-    csv_file=typer.Option(None, help="A csv file (one url per line)"),
-    url=typer.Option(None, help="URL to check instead of a file",),
-    output=typer.Option(None, help="Path to a file to save output to."),
-    verbose: bool = typer.Option(False, help="Print a result table to stdout"),
-):
+def check_feeds(yml_file=None, csv_file=None, url=None, output=None):
     results = {}
 
     if url:
@@ -96,7 +90,7 @@ def main(
         if "present" not in statuses:
             missing.append(url)
 
-    if missing and verbose:
+    if missing:
         print(f"Unable to find {len(missing)}/{len(results)} urls:")
         for url in missing:
             print(url)
@@ -108,7 +102,3 @@ def main(
         with open(output, "w") as f:
             f.write(json.dumps(results, indent=4))
             print(f"Results saved to {output}")
-
-
-if __name__ == "__main__":
-    typer.run(main)
