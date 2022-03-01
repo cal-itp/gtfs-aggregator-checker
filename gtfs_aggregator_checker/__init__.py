@@ -1,5 +1,4 @@
 from collections import OrderedDict
-import json
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -26,7 +25,7 @@ def clean_url(url):
     return urllib.parse.urlunparse(url)
 
 
-def check_feeds(yml_file=None, csv_file=None, url=None, output=None):
+def check_feeds(yml_file=None, csv_file=None, url=None):
     results = {}
 
     if url:
@@ -81,24 +80,4 @@ def check_feeds(yml_file=None, csv_file=None, url=None, output=None):
                 "public_web_url": public_web_url,
             }
 
-    missing = []
-    for url, data in results.items():
-        statuses = [
-            data["transitfeeds"]["status"],
-            data["transitland"]["status"],
-        ]
-        if "present" not in statuses:
-            missing.append(url)
-
-    if missing:
-        print(f"Unable to find {len(missing)}/{len(results)} urls:")
-        for url in missing:
-            print(url)
-    else:
-        matched = len(results) - len(missing)
-        print(f"Found {matched}/{len(results)} urls were found")
-
-    if output:
-        with open(output, "w") as f:
-            f.write(json.dumps(results, indent=4))
-            print(f"Results saved to {output}")
+    return results
