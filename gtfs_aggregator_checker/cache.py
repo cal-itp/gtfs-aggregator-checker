@@ -7,10 +7,9 @@ from .utils import url_split
 
 
 def get_cache_dir():
-    if "GTFS_CACHE_DIR" in os.environ:
-        path = Path(os.environ["GTFS_CACHE_DIR"])
-    else:
-        path = Path.home() / ".cache/gtfs-aggregator-checker"
+    if "GTFS_CACHE_DIR" not in os.environ:
+        return None
+    path = Path(os.environ["GTFS_CACHE_DIR"])
     path.mkdir(exist_ok=True, parents=True)
     return path
 
@@ -18,6 +17,9 @@ def get_cache_dir():
 def get_cached(key, func, directory=None):
     if not directory:
         directory = get_cache_dir()
+    if not directory:
+        # cache directory is not set, execute function and return
+        return func()
     path = directory / key
     if not path.exists():
         content = func()
@@ -39,6 +41,9 @@ def curl_cached(url, key=None):
         r = urllib.request.urlopen(req)
         return r.read().decode()
 
-    path = get_cache_dir() / domain
+    cache_dir = get_cache_dir()
+    if not cache_dir:
+        return get()
+    path = cache_dir / domain
     path.mkdir(exist_ok=True, parents=True)
     return get_cached(key, get, directory=path)

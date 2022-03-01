@@ -29,7 +29,15 @@ def get_feeds(after=None):
     return list(results), after
 
 
+class UnconfiguredEnvironment(Exception):
+    """base class for new exception"""
+
+    pass
+
+
 def get_transitland_urls():
+    if not API_KEY:
+        raise Exception("TRANSITLAND_API_KEY must be set")
     urls, after = get_feeds()
     while True:
         new_urls, after = get_feeds(after)
