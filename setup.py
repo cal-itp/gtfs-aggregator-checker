@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 import re
-from setuptools import setup, find_namespace_packages
+
+from setuptools import find_namespace_packages, setup
 
 _version_re = re.compile(r"__version__\s+=\s+(.*)")
 
