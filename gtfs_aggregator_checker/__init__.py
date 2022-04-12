@@ -1,12 +1,12 @@
-from collections import OrderedDict
 import urllib.error
 import urllib.parse
 import urllib.request
+from collections import OrderedDict
+
 import yaml
 
-from .transitland import get_transitland_urls
 from .transitfeeds import get_transitfeeds_urls
-
+from .transitland import get_transitland_urls
 
 __version__ = "1.0.1"
 SECRET_PARAMS = ["api_key", "token", "apiKey", "key"]

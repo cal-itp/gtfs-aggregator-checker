@@ -1,9 +1,12 @@
 import json
+from typing import List, Tuple
 
-from .config import env
+from tqdm import tqdm
+
 from .cache import curl_cached
+from .config import env
 
-API_KEY = env["TRANSITLAND_API_KEY"]
+API_KEY = env.get("TRANSITLAND_API_KEY")
 BASE_URL = f"https://transit.land/api/v2/rest/feeds?apikey={API_KEY}"
 BASE_URL += "&limit=1000"
 
@@ -29,19 +32,17 @@ def get_feeds(after=None):
     return list(results), after
 
 
-class UnconfiguredEnvironment(Exception):
-    """base class for new exception"""
-
-    pass
-
-
-def get_transitland_urls():
+def get_transitland_urls() -> List[Tuple[str, str]]:
+    print("fetching transitland URLs")
     if not API_KEY:
-        raise Exception("TRANSITLAND_API_KEY must be set")
+        raise RuntimeError("TRANSITLAND_API_KEY must be set")
+
     urls, after = get_feeds()
-    while True:
+    for _ in range(10):
         new_urls, after = get_feeds(after)
         urls += new_urls
         if not after:
             break
+    else:
+        print('WARNING: hit loop limit for transitland')
     return urls

@@ -1,7 +1,7 @@
 import os
-from pathlib import Path
 import urllib.error
 import urllib.request
+from pathlib import Path
 
 from .utils import url_split
 
