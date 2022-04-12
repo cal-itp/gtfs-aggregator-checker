@@ -1,8 +1,6 @@
 import json
 from typing import List, Tuple
 
-from tqdm import tqdm
-
 from .cache import curl_cached
 from .config import env
 
@@ -44,5 +42,5 @@ def get_transitland_urls() -> List[Tuple[str, str]]:
         if not after:
             break
     else:
-        print('WARNING: hit loop limit for transitland')
+        print("WARNING: hit loop limit for transitland")
     return urls
