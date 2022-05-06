@@ -1,5 +1,7 @@
-from bs4 import BeautifulSoup
 from urllib.error import HTTPError
+
+from bs4 import BeautifulSoup
+from tqdm import tqdm
 
 from .cache import curl_cached
 
@@ -15,7 +17,9 @@ def resolve_url(url):
     raise ValueError("Not a transit feed url: {url}")
 
 
-def get_transitfeeds_urls():
+def get_transitfeeds_urls(progress=False):
+    print("fetching transit feeds URLs")
+
     page_urls = []
     provider_urls = []
     feed_urls = []
@@ -39,6 +43,8 @@ def get_transitfeeds_urls():
         for a in soup.select("a.list-group-item"):
             feed_urls.append(resolve_url(a["href"]))
 
+    if progress:
+        feed_urls = tqdm(feed_urls, desc="Fetching individual feed URLs")
     for feed_url in feed_urls:
         try:
             html = curl_cached(feed_url)
