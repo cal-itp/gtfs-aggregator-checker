@@ -23,7 +23,6 @@ jobs:
     needs: checks
     if: "github.event_name == 'release' && startsWith(github.event.release.tag_name, 'v')"
     steps:
-
       - uses: actions/checkout@v2
       - name: "Set up Python"
         uses: actions/setup-python@v2
@@ -39,10 +38,26 @@ jobs:
           user: __token__
           password: ${{ secrets.PYPI_TEST_API_TOKEN }}
           repository_url: https://test.pypi.org/legacy/
-
       - name: "Upload to PyPI"
         uses: pypa/gh-action-pypi-publish@release/v1
         if: "!github.event.release.prerelease"
         with:
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
+  build_push:
+    name: Package docker image
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: jobs/gtfs-rt-parser
+          push: true
+          tags: ghcr.io/${{github.repository}}/gtfs-rt-parser:latest
