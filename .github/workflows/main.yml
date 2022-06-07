@@ -60,4 +60,4 @@ jobs:
         with:
           context: jobs/gtfs-rt-parser
           push: true
-          tags: ghcr.io/${{github.repository}}/gtfs-rt-parser:latest
+          tags: ghcr.io/${{github.repository}}:latest
