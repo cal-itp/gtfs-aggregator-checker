@@ -1,5 +1,3 @@
-# DEPRECATED: This project now lives at https://github.com/cal-itp/data-infra/tree/main/jobs/gtfs-aggregator-checker
-
 # GTFS Aggregator Checker
 
 This repo is to verify that a given list of feeds is listed in feed aggregators.

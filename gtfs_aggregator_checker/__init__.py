@@ -1,15 +1,14 @@
-from collections import OrderedDict
-import json
 import urllib.error
 import urllib.parse
 import urllib.request
+from collections import OrderedDict
+
 import yaml
 
-from .transitland import get_transitland_urls
 from .transitfeeds import get_transitfeeds_urls
+from .transitland import get_transitland_urls
 
-
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 SECRET_PARAMS = ["api_key", "token", "apiKey", "key"]
 
 
@@ -26,7 +25,7 @@ def clean_url(url):
     return urllib.parse.urlunparse(url)
 
 
-def check_feeds(yml_file=None, csv_file=None, url=None, output=None):
+def check_feeds(yml_file=None, csv_file=None, url=None, progress=False):
     results = {}
 
     if url:
@@ -61,7 +60,7 @@ def check_feeds(yml_file=None, csv_file=None, url=None, output=None):
                             "transitland": {"status": "missing"},
                         }
 
-    for public_web_url, url in get_transitland_urls():
+    for public_web_url, url in get_transitland_urls(progress=progress):
         if not url:
             continue
         url = clean_url(url)
@@ -71,7 +70,7 @@ def check_feeds(yml_file=None, csv_file=None, url=None, output=None):
                 "public_web_url": public_web_url,
             }
 
-    for public_web_url, url in get_transitfeeds_urls():
+    for public_web_url, url in get_transitfeeds_urls(progress=progress):
         if not url:
             continue
         url = clean_url(url)
@@ -81,24 +80,4 @@ def check_feeds(yml_file=None, csv_file=None, url=None, output=None):
                 "public_web_url": public_web_url,
             }
 
-    missing = []
-    for url, data in results.items():
-        statuses = [
-            data["transitfeeds"]["status"],
-            data["transitland"]["status"],
-        ]
-        if "present" not in statuses:
-            missing.append(url)
-
-    if missing:
-        print(f"Unable to find {len(missing)}/{len(results)} urls:")
-        for url in missing:
-            print(url)
-    else:
-        matched = len(results) - len(missing)
-        print(f"Found {matched}/{len(results)} urls were found")
-
-    if output:
-        with open(output, "w") as f:
-            f.write(json.dumps(results, indent=4))
-            print(f"Results saved to {output}")
+    return results
